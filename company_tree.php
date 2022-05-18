@@ -31,11 +31,11 @@ class Travel
 	 * @param  string  $companyId
 	 * @return void
 	 */
-	public function __construct($id, $price, $companyId)
+	public function __construct($attributes = [])
 	{
-		$this->id = $id;
-		$this->price = $price;
-		$this->companyId = $companyId;
+		$this->id = $attributes['id'] ?: '';
+		$this->price = $attributes['price'] ?: '';
+		$this->companyId = $attributes['companyId'] ?: '';
 	}
 
 	/**
@@ -52,7 +52,9 @@ class Travel
 
 		if (!empty($data)) {
 			foreach ($data as $travelData) {
-				$travels[] = new Travel($travelData->id, $travelData->price, $travelData->companyId);
+				$attributes = (array) $travelData;
+
+				$travels[] = new Travel($attributes);
 			}
 		}
 
@@ -79,13 +81,13 @@ class Company
 	 * @param  string  $parentId
 	 * @return void
 	 */
-	public function __construct($id, $name, $parentId)
+	public function __construct($attributes = [])
 	{
-		$this->id = $id;
-		$this->name = $name;
+		$this->id = $attributes['id'] ?: '';
+		$this->name = $attributes['name'] ?: '';
+		$this->parentId = $attributes['parentId'] ?: null;
 		$this->cost = 0;
 		$this->children = [];
-		$this->parentId = empty($parentId) ? null : $parentId;
 		$this->parent = null;
 	}
 
@@ -166,11 +168,13 @@ class Company
 
 		if (!empty($data)) {
 			foreach ($data as $companyData) {
+				$attributes = (array) $companyData;
+
 				if (empty($companyData->parentId)) {
-					$company = new Company($companyData->id, $companyData->name, $companyData->parentId);
+					$company = new Company($attributes);
 				} else {
 					if (!is_null($company)) {
-						$company->addChildCompany(new Company($companyData->id, $companyData->name, $companyData->parentId));
+						$company->addChildCompany(new Company($attributes));
 					}
 				}
 			}
