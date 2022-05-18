@@ -91,6 +91,23 @@ class Company
 		$this->parent = null;
 	}
 
+	
+	private function find($id) {
+		$result = false;
+
+		if ($id === $this->id) {
+			$result = &$this;
+		} else {
+			foreach ($this->children as $childCompany) {
+				$result = $childCompany->find($id);
+				if ($result) {
+					break;
+				}
+			}
+		}
+		return $result;
+	}
+
 	/**
 	 * Add child or root to Company Tree
 	 *
@@ -99,16 +116,11 @@ class Company
 	 */
 	public function addChildCompany(Company $company)
 	{
-		if ($company->parentId === $this->id) {
-			$company->parent = &$this;
-			$this->children[] = $company;
-		} else {
-			foreach ($this->children as $childCompany) {
-				$result = $childCompany->addChildCompany($company);
-				if ($result) {
-					break;
-				}
-			}
+		$parentCompany = $this->find($company->parentId);
+
+		if(!empty($parentCompany)) {
+			$company->parent = $parentCompany;
+			$parentCompany->children[] = $company;			
 		}
 	}
 
@@ -129,15 +141,10 @@ class Company
 	 */
 	public function addTravel(Travel $travel)
 	{
-		if ($travel->companyId === $this->id) {
-			$this->sumCost($travel->price);
-		} else {
-			foreach ($this->children as $childCompany) {
-				$result = $childCompany->addTravel($travel);
-				if ($result) {
-					break;
-				}
-			}
+		$company = $this->find($travel->companyId);
+
+		if(!empty($company)) {
+			$company->sumCost($travel->price);		
 		}
 	}
 
