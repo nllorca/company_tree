@@ -1,7 +1,24 @@
 <?php
+trait Json
+{
+	public static function retrieveJson($jsonEndpoint)
+	{
+		$json = file_get_contents($jsonEndpoint);
+
+		if (!$json) {
+			return false;
+		}
+
+		$data = json_decode($json);
+
+		return $data;
+	}
+}
 
 class Travel
 {
+	use Json;
+
 	public $id;
 	public $price;
 	public $companyId;
@@ -20,10 +37,33 @@ class Travel
 		$this->price = $price;
 		$this->companyId = $companyId;
 	}
+
+	/**
+	 * Get array of Travel instances from a Json endpoint
+	 *
+	 * @param  string  $jsonEndpoint
+	 * @return array
+	 */
+	public static function getTravelsFromJson($jsonEndpoint)
+	{
+		$travels = [];
+
+		$data = self::retrieveJson($jsonEndpoint);
+
+		if (!empty($data)) {
+			foreach ($data as $travelData) {
+				$travels[] = new Travel($travelData->id, $travelData->price, $travelData->companyId);
+			}
+		}
+
+		return $travels;
+	}
 }
 
 class Company
 {
+	use Json;
+
 	public $id;
 	public $name;
 	public $cost;
@@ -111,40 +151,18 @@ class Company
 			$this->addTravel($travel);
 		}
 	}
-}
 
-class TestScript
-{
-	const COMPANIES_ENDPOINT = 'https://5f27781bf5d27e001612e057.mockapi.io/webprovise/companies';
-
-	const TRAVELS_ENDPOINT = 'https://5f27781bf5d27e001612e057.mockapi.io/webprovise/travels';
-
-	private $start, $current, $output, $elapsedTime;
-
-	private function retrieveJson($jsonEndpoint)
+	/**
+	 * Get Company instance from a Json endpoint
+	 *
+	 * @param  string  $jsonEndpoint
+	 * @return Company
+	 */
+	public static function getCompanyFromJson($jsonEndpoint)
 	{
-		$json = file_get_contents($jsonEndpoint);
-
-		if (!$json) {
-			return false;
-		}
-
-		$data = json_decode($json);
-
-		return $data;
-	}
-
-	/*
-	I am understanding the Travel and Company classes as models, so I am not adding this functionality within the Company class, but as part of the Test class.
-	*/
-	private function getCompanyFromJson($jsonEndpoint)
-	{
-		//I assume that the first element of the json is the root
 		$company = null;
 
-		$data = $this->retrieveJson($jsonEndpoint);
-
-		$this->echoElapsedTime('Time elapsed retrieving companies JSON', $this->current);
+		$data = self::retrieveJson($jsonEndpoint);
 
 		if (!empty($data)) {
 			foreach ($data as $companyData) {
@@ -158,30 +176,17 @@ class TestScript
 			}
 		}
 
-		$this->echoElapsedTime('Time elapsed building companies tree', $this->current);
-
 		return $company;
 	}
+}
 
+class TestScript
+{
+	const COMPANIES_ENDPOINT = 'https://5f27781bf5d27e001612e057.mockapi.io/webprovise/companies';
 
-	private function getTravelsFromJson($jsonEndpoint)
-	{
-		$travels = [];
+	const TRAVELS_ENDPOINT = 'https://5f27781bf5d27e001612e057.mockapi.io/webprovise/travels';
 
-		$data = $this->retrieveJson($jsonEndpoint);
-
-		$this->echoElapsedTime('Time elapsed retrieving travels JSON', $this->current);
-
-		if (!empty($data)) {
-			foreach ($data as $travelData) {
-				$travels[] = new Travel($travelData->id, $travelData->price, $travelData->companyId);
-			}
-		}
-
-		$this->echoElapsedTime('Time elapsed building travels array', $this->current);
-
-		return $travels;
-	}
+	private $start, $current, $output, $elapsedTime;
 
 	private function echoElapsedTime($message, $from)
 	{
@@ -212,13 +217,17 @@ class TestScript
 
 		$this->startTime();
 
-		$company = $this->getCompanyFromJson(self::COMPANIES_ENDPOINT);
+		$company = Company::getCompanyFromJson(self::COMPANIES_ENDPOINT);
+
+		$this->echoElapsedTime('Time elapsed getting companies from Json', $this->current);
 
 		if (empty($company)) {
 			die('Error while getting companies from JSON' . PHP_EOL);
 		}
 
-		$travels = $this->getTravelsFromJson(self::TRAVELS_ENDPOINT);
+		$travels = Travel::getTravelsFromJson(self::TRAVELS_ENDPOINT);
+
+		$this->echoElapsedTime('Time elapsed getting travels from Json', $this->current);
 
 		$company->addTravels($travels);
 
