@@ -100,7 +100,7 @@ class Company
 		} else {
 			foreach ($this->children as $childCompany) {
 				$result = $childCompany->find($id);
-				if ($result) {
+				if ($result !== false) {
 					break;
 				}
 			}
