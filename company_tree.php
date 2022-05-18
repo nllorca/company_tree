@@ -98,6 +98,19 @@ class Company
 			}
 		}
 	}
+
+	/**
+	 * Add travels to Company  
+	 *
+	 * @param  array  $travels
+	 * @return void
+	 */
+	public function addTravels($travels)
+	{
+		foreach ($travels as $travel) {
+			$this->addTravel($travel);
+		}
+	}
 }
 
 class TestScript
@@ -204,9 +217,7 @@ class TestScript
 
 		$travels = $this->getTravelsFromJson(self::TRAVELS_ENDPOINT);
 
-		foreach ($travels as $travel) {
-			$company->addTravel($travel);
-		}
+		$company->addTravels($travels);
 
 		$this->echoElapsedTime('Time elapsed adding travels to companies', $this->current);
 
