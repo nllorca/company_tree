@@ -6,6 +6,14 @@ class Travel
 	public $price;
 	public $companyId;
 
+	/**
+	 * Create a new Travel instance.
+	 *
+	 * @param  string  $id
+	 * @param  string  $price
+	 * @param  string  $companyId
+	 * @return void
+	 */
 	public function __construct($id, $price, $companyId)
 	{
 		$this->id = $id;
@@ -23,6 +31,14 @@ class Company
 	private $parentId;
 	private $parent;
 
+	/**
+	 * Create a new Company instance.
+	 *
+	 * @param  string  $id
+	 * @param  string  $name
+	 * @param  string  $parentId
+	 * @return void
+	 */
 	public function __construct($id, $name, $parentId)
 	{
 		$this->id = $id;
@@ -33,6 +49,12 @@ class Company
 		$this->parent = null;
 	}
 
+	/**
+	 * Add child or root to Company Tree
+	 *
+	 * @param  Company  $company
+	 * @return void
+	 */
 	public function addChildCompany(Company $company)
 	{
 		if ($company->parentId === $this->id) {
@@ -57,6 +79,12 @@ class Company
 		}
 	}
 
+	/**
+	 * Sums the price of a travel, to a Company and its ancestors  
+	 *
+	 * @param  Travel  $travel
+	 * @return void
+	 */
 	public function addTravel(Travel $travel)
 	{
 		if ($travel->companyId === $this->id) {
@@ -95,6 +123,7 @@ class TestScript
 
 	private function getCompanyFromJson($jsonEndpoint)
 	{
+		//I assume that the first element of the json is the root
 		$company = null;
 
 		$data = $this->retrieveJson($jsonEndpoint);
@@ -106,7 +135,9 @@ class TestScript
 				if (empty($companyData->parentId)) {
 					$company = new Company($companyData->id, $companyData->name, $companyData->parentId);
 				} else {
-					$company->addChildCompany(new Company($companyData->id, $companyData->name, $companyData->parentId));
+					if (!is_null($company)) {
+						$company->addChildCompany(new Company($companyData->id, $companyData->name, $companyData->parentId));
+					}
 				}
 			}
 		}
