@@ -134,6 +134,9 @@ class TestScript
 		return $data;
 	}
 
+	/*
+	I am understanding the Travel and Company classes as models, so I am not adding this functionality within the Company class, but as part of the Test class.
+	*/
 	private function getCompanyFromJson($jsonEndpoint)
 	{
 		//I assume that the first element of the json is the root
