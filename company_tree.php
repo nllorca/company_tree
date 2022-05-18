@@ -237,9 +237,13 @@ class TestScript
 
 		$this->echoElapsedTime('Time elapsed adding travels to companies', $this->current);
 
+		$jsonOutput = json_encode(get_object_vars($company), JSON_PRETTY_PRINT);
+
+		file_put_contents('output.json', $jsonOutput);
+		
 		if ($this->output) {
 			echo 'JSON OUTPUT:' . PHP_EOL;
-			echo json_encode(get_object_vars($company), JSON_PRETTY_PRINT) . PHP_EOL;
+			echo $jsonOutput . PHP_EOL;
 		}
 
 		if ($this->elapsedTime) {
