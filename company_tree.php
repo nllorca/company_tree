@@ -85,7 +85,7 @@ class Company
 	{
 		$this->id = $attributes['id'] ?: '';
 		$this->name = $attributes['name'] ?: '';
-		$this->parentId = $attributes['parentId'] ?: null;
+		$this->parentId = $attributes['parentId'] ?: '';
 		$this->cost = 0;
 		$this->children = [];
 		$this->parent = null;
