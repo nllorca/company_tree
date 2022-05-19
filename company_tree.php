@@ -96,7 +96,7 @@ class Company
 		$result = false;
 
 		if ($id === $this->id) {
-			$result = &$this;
+			$result = $this;
 		} else {
 			foreach ($this->children as $childCompany) {
 				$result = $childCompany->find($id);
